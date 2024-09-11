@@ -63,6 +63,8 @@ You can configure the global options for all sqs workers by creating an initiali
 require 'sidekiq/aws/sqs'
 require 'aws-sdk-sqs'
 
+require_relative '../../app/jobs/my_worker'
+
 Sidekiq::AWS::SQS.configure do |config|
   config.sqs_client = Aws::SQS::Client.new # global SQS client for all sqs workers
 
