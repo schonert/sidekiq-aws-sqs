@@ -30,27 +30,14 @@ module Sidekiq
         end
 
         def sqs_options_struct
-          if @sqs_options[:wait_time_seconds].blank?
-            @sqs_options[:wait_time_seconds] =
-              Sidekiq::AWS::SQS.config.wait_time_seconds
-          end
-
-          if @sqs_options[:max_number_of_messages].blank?
-            @sqs_options[:max_number_of_messages] =
-              Sidekiq::AWS::SQS.config.max_number_of_messages
-          end
-
-          if @sqs_options[:destroy_on_received].blank?
-            @sqs_options[:destroy_on_received] =
-              Sidekiq::AWS::SQS.config.destroy_on_received
-          end
-
           @sqs_options[:client] ||= Sidekiq::AWS::SQS.config.sqs_client
+          @sqs_options[:wait_time_seconds] ||= Sidekiq::AWS::SQS.config.wait_time_seconds
+          @sqs_options[:max_number_of_messages] ||= Sidekiq::AWS::SQS.config.max_number_of_messages
+          @sqs_options[:destroy_on_received] ||= Sidekiq::AWS::SQS.config.destroy_on_received
 
-          if @sqs_options[:queue_name].present?
-            @sqs_options[:queue_url] ||= @sqs_options[:client].get_queue_url(
-              queue_name: @sqs_options[:queue_name]
-            ).queue_url
+          if @sqs_options[:queue_name].present? && @sqs_options[:queue_url].blank?
+            queue_url = @sqs_options[:client].get_queue_url(queue_name: @sqs_options[:queue_name]).queue_url
+            @sqs_options[:queue_url] = queue_url
           end
 
           OpenStruct.new(@sqs_options)
