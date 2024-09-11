@@ -9,7 +9,7 @@ module Sidekiq
 
           if need_to_raise_for_queue_url?
             raise ArgumentError,
-                  'You must provide a SQS queue URL like `sqs_options queue_url: "url"'
+                  'You must provide either a SQS queue URL or queue name. Like `sqs_options queue_url: "url"` or `sqs_options queue_name: "name"`'
           end
 
           raise ArgumentError, 'You must provide a SQS client' if need_to_raise_for_client?
@@ -45,7 +45,13 @@ module Sidekiq
               Sidekiq::AWS::SQS.config.destroy_on_received
           end
 
-          @sqs_options[:client] = Sidekiq::AWS::SQS.config.sqs_client if @sqs_options[:client].blank?
+          @sqs_options[:client] ||= Sidekiq::AWS::SQS.config.sqs_client
+
+          if @sqs_options[:queue_name].present?
+            @sqs_options[:queue_url] ||= @sqs_options[:client].get_queue_url(
+              queue_name: @sqs_options[:queue_name]
+            ).queue_url
+          end
 
           OpenStruct.new(@sqs_options)
         end
@@ -65,7 +71,7 @@ module Sidekiq
         end
 
         def need_to_raise_for_queue_url?
-          @sqs_options[:queue_url].blank?
+          @sqs_options[:queue_url].blank? && !@sqs_options[:queue_name].blank?
         end
 
         def need_to_raise_for_destroy_on_received?

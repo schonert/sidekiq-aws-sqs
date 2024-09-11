@@ -39,7 +39,8 @@ class MyWorker
   include Sidekiq::Worker
   include Sidekiq::AWS::SQS::Worker
 
-  sqs_options queue_url: 'https://sqs.foo.amazonaws.com/123/bar',
+  sqs_options queue_url: 'https://sqs.foo.amazonaws.com/123/bar', # Requires either queue_url or queue_name
+              queue_name: 'foo_bar', # alternative to queue_url
               wait_time_seconds: 20, # optional, default: 20
               destroy_on_received: true, # optional, default: false
               max_number_of_messages: 10, # optional, default: 10
