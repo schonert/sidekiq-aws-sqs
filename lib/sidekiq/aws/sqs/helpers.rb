@@ -58,7 +58,7 @@ module Sidekiq
         end
 
         def need_to_raise_for_queue_url?
-          @sqs_options[:queue_url].blank? && !@sqs_options[:queue_name].blank?
+          @sqs_options[:queue_url].blank? && @sqs_options[:queue_name].blank?
         end
 
         def need_to_raise_for_destroy_on_received?
