@@ -37,7 +37,7 @@ require 'sidekiq/aws/sqs'
 
 class MyWorker
   include Sidekiq::Worker
-  include Sidekiq::AWS::SQS::Worker
+  extend Sidekiq::AWS::SQS::Worker
 
   sqs_options queue_url: 'https://sqs.foo.amazonaws.com/123/bar',
               wait_time_seconds: 20, # optional, default: 20
